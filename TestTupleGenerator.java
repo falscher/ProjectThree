@@ -6,6 +6,7 @@
  */
 
 import static java.lang.System.out;
+import java.util.Random;
 
 /*****************************************************************************************
  * This class tests the TupleGenerator on the Student Registration Database defined in the
@@ -43,7 +44,7 @@ public class TestTupleGenerator
         test.addRelSchema ("Teaching",
                            "crsCode semester profId",
                            "String String Integer",
-                           "crcCode semester",
+                           "crsCode semester",
                            new String [][] {{ "profId", "Professor", "id" },
                                             { "crsCode", "Course", "crsCode" }});
         
@@ -57,20 +58,47 @@ public class TestTupleGenerator
 
         String [] tables = { "Student", "Professor", "Course", "Teaching", "Transcript" };
         
-        int tups [] = new int [] { 10000, 1000, 2000, 50000, 5000 };
-    
+        int tups [] = new int [] { 10000, 10, 20, 50, 100 };
+        long sumJoin = 0;
+        long sumSelect = 0;
+        int runCount = 1;
+        for(int i = 0; i < 20; i++) {
         Comparable [][][] resultTest = test.generate (tups);
+
+        String studentAttr = "id name address status";
+        String studentDom = "Integer String String String";
+        String transcriptAttr = "studId crsCode semester grade";
+        String transcriptDom = "Integer String String String";
+
+        Table student = new Table("Student", studentAttr, studentDom, "id");
+        Table transcript = new Table("Transcript", transcriptAttr, transcriptDom, "studId");
+
+        for (int k = 0; k < resultTest[0].length; k++) {
+          student.insert(resultTest[0][k]);
+        }
+
+        for (int x = 0; x < resultTest[4].length; x++) {
+          transcript.insert(resultTest[4][x]);
+        }
+
+        Random gen = new Random();
+        int idM = gen.nextInt(1000000);
+        KeyType tempType = new KeyType(idM);
+      
+        long startTime = System.currentTimeMillis() * 10^5;
+      
+        Table join = student.join("id", "studId", transcript);
+        long endTime = System.currentTimeMillis() * 10^5;
+      
+
+        sumJoin = sumJoin + (endTime - startTime);
+        System.out.println("run time: " + (endTime - startTime));
+        System.out.println("run number: " + runCount);
+        runCount++;
         
-        for (int i = 0; i < resultTest.length; i++) {
-            out.println (tables [i]);
-            for (int j = 0; j < resultTest [i].length; j++) {
-                for (int k = 0; k < resultTest [i][j].length; k++) {
-                    out.print (resultTest [i][j][k] + ",");
-                } // for
-                out.println ();
-            } // for
-            out.println ();
-        } // for
+        }
+        System.out.println("Join search avg: " + sumJoin / 20);
+        System.out.println("Join search std dev: " + (sumJoin / 20) / Math.sqrt(20));
     } // main
 
 } // TestTupleGenerator

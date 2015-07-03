@@ -12,6 +12,7 @@ import java.util.stream.*;
 import static java.lang.Boolean.*;
 import static java.lang.System.arraycopy;
 import static java.lang.System.out;
+import java.lang.Integer;
 
 /****************************************************************************************
  * This class implements relational database tables (including attribute names, domains
@@ -87,7 +88,9 @@ public class Table
         domain = _domain;
         key = _key;
         tuples = new ArrayList<>();
-        index = new TreeMap<>();       // also try BPTreeMap, LinHashMap or ExtHashMap
+        //index = new ExtHashMap(Integer.class, Integer.class, 11);
+        index = new BpTreeMap(KeyType.class, Comparable[].class);
+        //index = new TreeMap<>();       // also try BPTreeMap, LinHashMap or ExtHashMap
     } // constructor
 
     /************************************************************************************
@@ -106,7 +109,9 @@ public class Table
         domain = _domain;
         key = _key;
         tuples = _tuples;
-        index = new TreeMap<>();       // also try BPTreeMap, LinHashMap or ExtHashMap
+        //index = new ExtHashMap(Integer.class, Integer.class, 11);
+        index = new BpTreeMap(KeyType.class, Comparable[].class);
+        //index = new TreeMap<>();       // also try BPTreeMap, LinHashMap or ExtHashMap
     } // constructor
 
     /************************************************************************************
@@ -188,8 +193,6 @@ public class Table
                 rows.add(tup);
             }
         }
-
-
         return new Table(name + count++, attribute, domain, key, rows);
     } // select
 
